@@ -163,3 +163,4 @@ private fun startVoiceRecognition() {
 
     speechRecognizer?.startListening(intent)
 }
+}
