@@ -21,6 +21,7 @@ class MainActivity : Activity() {
 
     private lateinit var status: TextView
     private val requestCode = 42
+private var speechRecognizer: SpeechRecognizer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
