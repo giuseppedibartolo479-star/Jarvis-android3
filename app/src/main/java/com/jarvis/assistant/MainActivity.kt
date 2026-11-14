@@ -112,7 +112,7 @@ private var speechRecognizer: SpeechRecognizer? = null
         val intent = Intent(this, WakeWordService::class.java)
         ContextCompat.startForegroundService(this, intent)
         status.text = "J.A.R.V.I.S.\nAvvio ascolto..."
-    }
+    
 }
 
 private fun startVoiceRecognition() {
