@@ -105,6 +105,7 @@ private var speechRecognizer: SpeechRecognizer? = null
             startWakeService()
         } else {
             status.text = "Permesso microfono necessario"
+           }
         }
     private fun startWakeService() {
     val intent = Intent(this, WakeWordService::class.java)
@@ -113,7 +114,7 @@ private var speechRecognizer: SpeechRecognizer? = null
     startVoiceRecognition()
 }
 
-   
+  
     
 }
 
