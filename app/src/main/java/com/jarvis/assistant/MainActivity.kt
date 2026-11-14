@@ -21,7 +21,7 @@ class MainActivity : Activity() {
 
     private lateinit var status: TextView
     private val requestCode = 42
-private var speechRecognizer: SpeechRecognizer? = null
+    private var speechRecognizer: SpeechRecognizer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +47,9 @@ private var speechRecognizer: SpeechRecognizer? = null
                 stopService(
                     Intent(this@MainActivity, WakeWordService::class.java)
                 )
+                speechRecognizer?.stopListening()
+                speechRecognizer?.destroy()
+                speechRecognizer = null
                 status.text = "J.A.R.V.I.S.\nSistema disattivato"
             }
         }
@@ -105,65 +108,66 @@ private var speechRecognizer: SpeechRecognizer? = null
             startWakeService()
         } else {
             status.text = "Permesso microfono necessario"
-           }
         }
+    }
+
     private fun startWakeService() {
-    val intent = Intent(this, WakeWordService::class.java)
-    ContextCompat.startForegroundService(this, intent)
-    status.text = "J.A.R.V.I.S.\nAvvio ascolto..."
-    startVoiceRecognition()
-}
-
-  
-    
-}
-
-private fun startVoiceRecognition() {
-    if (!SpeechRecognizer.isRecognitionAvailable(this)) {
-        status.text = "Riconoscimento vocale non disponibile"
-        return
+        val intent = Intent(this, WakeWordService::class.java)
+        ContextCompat.startForegroundService(this, intent)
+        status.text = "J.A.R.V.I.S.\nAvvio ascolto..."
+        startVoiceRecognition()
     }
 
-    speechRecognizer?.destroy()
-
-    speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
-
-    speechRecognizer?.setRecognitionListener(object : RecognitionListener {
-
-        override fun onReadyForSpeech(params: Bundle?) {
-            status.text = "J.A.R.V.I.S.\nTi ascolto..."
+    private fun startVoiceRecognition() {
+        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
+            status.text = "Riconoscimento vocale non disponibile"
+            return
         }
 
-        override fun onResults(results: Bundle?) {
-            val matches = results?.getStringArrayList(
-                SpeechRecognizer.RESULTS_RECOGNITION
+        speechRecognizer?.destroy()
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
+
+        speechRecognizer?.setRecognitionListener(object : RecognitionListener {
+
+            override fun onReadyForSpeech(params: Bundle?) {
+                status.text = "J.A.R.V.I.S.\nTi ascolto..."
+            }
+
+            override fun onResults(results: Bundle?) {
+                val matches = results?.getStringArrayList(
+                    SpeechRecognizer.RESULTS_RECOGNITION
+                )
+                val spokenText = matches?.firstOrNull()
+                status.text = spokenText ?: "Non ho capito"
+            }
+
+            override fun onError(error: Int) {
+                status.text = "Errore nel riconoscimento vocale: $error"
+            }
+
+            override fun onBeginningOfSpeech() {}
+            override fun onRmsChanged(rmsdB: Float) {}
+            override fun onBufferReceived(buffer: ByteArray?) {}
+            override fun onEndOfSpeech() {}
+            override fun onPartialResults(partialResults: Bundle?) {}
+            override fun onEvent(eventType: Int, params: Bundle?) {}
+        })
+
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
             )
-
-            val spokenText = matches?.firstOrNull()
-
-            status.text = spokenText ?: "Non ho capito"
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE,
+                "it-IT")
         }
 
-        override fun onError(error: Int) {
-            status.text = "Errore nel riconoscimento vocale: $error"
-        }
-
-        override fun onBeginningOfSpeech() {}
-        override fun onRmsChanged(rmsdB: Float) {}
-        override fun onBufferReceived(buffer: ByteArray?) {}
-        override fun onEndOfSpeech() {}
-        override fun onPartialResults(partialResults: Bundle?) {}
-        override fun onEvent(eventType: Int, params: Bundle?) {}
-    })
-
-    val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-        putExtra(
-            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-        )
-        putExtra(RecognizerIntent.EXTRA_LANGUAGE, "it-IT")
+        speechRecognizer?.startListening(intent)
     }
 
-    speechRecognizer?.startListening(intent)
-}
+    override fun onDestroy() {
+        speechRecognizer?.destroy()
+        speechRecognizer = null
+        super.onDestroy()
+    }
 }
