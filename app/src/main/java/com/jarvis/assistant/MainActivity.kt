@@ -106,12 +106,14 @@ private var speechRecognizer: SpeechRecognizer? = null
         } else {
             status.text = "Permesso microfono necessario"
         }
-    }
-
     private fun startWakeService() {
-        val intent = Intent(this, WakeWordService::class.java)
-        ContextCompat.startForegroundService(this, intent)
-        status.text = "J.A.R.V.I.S.\nAvvio ascolto..."
+    val intent = Intent(this, WakeWordService::class.java)
+    ContextCompat.startForegroundService(this, intent)
+    status.text = "J.A.R.V.I.S.\nAvvio ascolto..."
+    startVoiceRecognition()
+}
+
+   
     
 }
 
