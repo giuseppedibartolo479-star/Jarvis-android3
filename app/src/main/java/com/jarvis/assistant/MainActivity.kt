@@ -113,7 +113,9 @@ private var speechRecognizer: SpeechRecognizer? = null
         ContextCompat.startForegroundService(this, intent)
         status.text = "J.A.R.V.I.S.\nAvvio ascolto..."
     }
-}private fun startVoiceRecognition() {
+}
+
+private fun startVoiceRecognition() {
     if (!SpeechRecognizer.isRecognitionAvailable(this)) {
         status.text = "Riconoscimento vocale non disponibile"
         return
