@@ -13,7 +13,7 @@
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.jarvis.assistant.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,7 +22,7 @@
         </activity>
 
         <service
-            android:name=".WakeWordService"
+            android:name="com.jarvis.assistant.WakeWordService"
             android:exported="false"
             android:foregroundServiceType="microphone" />
 
